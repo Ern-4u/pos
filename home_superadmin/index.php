@@ -117,6 +117,21 @@ else {
       </div><!-- /.container-fluid -->
     </div>
     <!-- /.content-header -->
+     <?php 
+     $query_terlaris = mysqli_query($conn, "SELECT 
+    p.kode_barang,
+    p.nama_barang,
+    SUM(td.jumlah) AS total_terjual,
+    SUM(td.jumlah * td.harga_jual) AS total_pendapatan
+    FROM detail_nota_jual td
+    JOIN nota_jual t ON td.kode_nota = t.kode_nota
+    JOIN barang p ON td.kode_barang = p.kode_barang
+    WHERE t.tgl_penjualan >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+    GROUP BY p.kode_barang, p.nama_barang
+    ORDER BY total_terjual DESC
+    LIMIT 10;")or die(mysqli_error($conn));
+     ?>
+     
 
     <!-- Main content -->
     <div class="content">
@@ -139,7 +154,7 @@ else {
           </div>
           <!-- ./col -->
           <div class="col-lg-3 col-6">
-            <!-- small box -->
+            <!-- small box --> 
             <div class="small-box bg-warning">
               <div class="inner">
                 <h3>Rp.<?= $total_pembelian['total_pembelian'] ?></h3>
@@ -186,6 +201,35 @@ else {
           </div>
         </div>
         <!-- /.row -->
+         <dv class="row">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="cartd-title">Produk Terlaris</h3>
+            </div>
+            <div class="card-header">
+              <table class="table table-bordered table-striped">
+              <thead>
+              <tr>
+                <th>No</th>
+                <th>Nama Produk</th>
+                <th>Total Terjual</th>
+                <th>Total Pendapatan</th>
+              </tr>
+              </thead>
+              <tbody>
+              <?php $no = 1; while ($row = mysqli_fetch_assoc($query_terlaris)): ?>
+              <tr>
+                <td><?= $no++ ?></td>
+                <td><?= $row['nama_barang'] ?></td>
+                <td><?= $row['total_terjual'] ?></td>
+                <td><?= number_format($row['total_pendapatan'], 0, ',', '.') ?></td>
+              </tr>
+              <?php endwhile; ?>
+            </table>
+            </tbody>
+            </div>
+          </div>
+         </dv>
 
       </div>
       <!-- /.container-fluid -->

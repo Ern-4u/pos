@@ -20,13 +20,6 @@ else {
   $hal = "superadmin_nota_jual";
   $kode_nota = @$_GET['kode_nota'];
 
-  $query = "SELECT detail_nota_jual.*, nota_jual.kode_nota ,barang.nama_barang
-            FROM detail_nota_jual 
-            LEFT JOIN nota_jual ON detail_nota_jual.kode_nota = nota_jual.kode_nota
-            LEFT JOIN barang ON detail_nota_jual.kode_barang = barang.kode_barang
-            where detail_nota_jual.kode_nota = '$kode_nota'";
-  $result = mysqli_query($conn, $query);
-  $data_detail_nota = mysqli_fetch_all($result, MYSQLI_ASSOC);
  
 ?>
 
@@ -116,66 +109,143 @@ else {
 
     <!-- Main content -->
     <div class="content">
-      <div class="container-fluid">
-        <div class="card">
-              <div class="card-header">
-                <h3 class="card-title">Data Detail Nota Jual</h3>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                <button data-toggle="modal" data-target="#modal-tambah" class="btn btn-primary mb-3" type="button"><i class="fas fa-plus"></i> Tambah Data</button>
-                <a href="nota.php?id=<?= $kode_nota ?>" target="_blank" class="btn btn-info mb-3"><i class="fas fa-file-pdf"></i> Buat Nota</a>
-                <table id="example1" class="table table-bordered table-striped">
-                  <thead>
-                  <tr>
-                    <th width="5%">No</th>
-                    <th>ID</th>
-                    <th>Kode Nota</th>
-                    <th>Barang</th>
-                    <th>Jumlah</th>
-                    <th>Harga Jual</th>
-                    <th>Total Harga Jual</th>
-                    <th>Aksi</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                  $no = 1; 
-                  foreach ($data_detail_nota as $s) : ?>
-                    <tr>
-                      <td><?=  $no++ ; ?></td>
-                      <td><?= $s['id']; ?></td>
-                      <td><?= $s['kode_nota']; ?></td>
-                      <td><?= $s['nama_barang']; ?></td>
-                      <td><?= $s['jumlah'] ?> </td>
-                      <td><?= $s['harga_jual'] ?> </td>
-                      <td><?= $s['total_harga_jual'] ?> </td>
-                      
-                      <td>
-                        <a href="hapus.php?id=<?= $s['id']?>&kode_nota=<?= $s['kode_nota']?>" 
-                        class="btn btn-danger btn-xs" onclick="return confirm('YAKIN LU?')">
-                        <i class="fas fa-trash"></i></a>
-                        <button class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modal-edit" 
-                        data-id="<?= $s['id'] ?>" 
-                        data-kode_nota="<?= $s['kode_nota'] ?>" 
-                        data-kode_barang="<?= $s['kode_barang'] ?>" 
-                        data-jumlah="<?= $s['jumlah'] ?>" 
-                        data-harga_jual="<?= $s['harga_jual'] ?>" 
-                        data-total_harga_jual="<?= $s['total_harga_jual'] ?>" 
-                        
-                        ><i class="fas fa-edit"></i>
-                        </button>
-                      </td>
-                    </tr>
-                     <?php endforeach; ?>
-                  </tbody>
-                </table>
-              </div>
-              <!-- /.card-body -->
-        </div>
-        <!-- /.card -->
 
-        
+      <div class="container-fluid">
+        <div class="card card-primary card-outline card-tabs">
+              <div class="card-header p-0 pt-1 border-bottom-0">
+                <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
+                  <li class="nav-item">
+                    <a class="nav-link active" id="custom-tabs-three-home-tab" data-toggle="pill" href="#custom-tabs-three-home" role="tab" aria-controls="custom-tabs-three-home" aria-selected="true">Barang Reguler</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" id="custom-tabs-three-profile-tab" data-toggle="pill" href="#custom-tabs-three-profile" role="tab" aria-controls="custom-tabs-three-profile" aria-selected="false">Barang Konsinyasi</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="card-body">
+                <div class="tab-content" id="custom-tabs-three-tabContent">
+                  <?php 
+                  $query_barang = "SELECT detail_nota_jual.*, nota_jual.kode_nota ,barang.nama_barang
+                    FROM detail_nota_jual 
+                    LEFT JOIN nota_jual ON detail_nota_jual.kode_nota = nota_jual.kode_nota
+                    LEFT JOIN barang ON detail_nota_jual.kode_barang = barang.kode_barang
+                    where detail_nota_jual.kode_nota = '$kode_nota'";
+                    $result_barang = mysqli_query($conn, $query_barang);
+                    $data_detail_nota_r = mysqli_fetch_all($result_barang, MYSQLI_ASSOC);
+                  ?>
+                  <div class="tab-pane fade show active" id="custom-tabs-three-home" role="tabpanel" aria-labelledby="custom-tabs-three-home-tab">
+                    <button data-toggle="modal" data-target="#modal-tambah_br" class="btn btn-primary mb-3" type="button"><i class="fas fa-plus"></i> Tambah Data</button>
+                    <a href="nota.php?id=<?= $kode_nota ?>" target="_blank" class="btn btn-info mb-3"><i class="fas fa-file-pdf"></i> Buat Nota</a>
+                    <table id="example1" class="table table-bordered table-striped">
+                      <thead>
+                      <tr>
+                        <th width="5%">No</th>
+                        <th>ID</th>
+                        <th>Kode Nota</th>
+                        <th>Barang</th>
+                        <th>Jumlah</th>
+                        <th>Harga Jual</th>
+                        <th>Total Harga Jual</th>
+                        <th>Aksi</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                        <?php
+                      $no = 1; 
+                      foreach ($data_detail_nota_r as $sr) : ?>
+                        <tr>
+                          <td><?=  $no++ ; ?></td>
+                          <td><?= $sr['id']; ?></td>
+                          <td><?= $sr['kode_nota']; ?></td>
+                          <td><?= $sr['nama_barang']; ?></td>
+                          <td><?= $sr['jumlah'] ?> </td>
+                          <td><?= $sr['harga_jual'] ?> </td>
+                          <td><?= $sr['total_harga_jual'] ?> </td>
+                          
+                          
+                          <td>
+                            <a href="hapus.php?id=<?= $sr['id']?>&kode_nota=<?= $sr['kode_nota']?>" 
+                            class="btn btn-danger btn-xs" onclick="return confirm('YAKIN LU?')">
+                            <i class="fas fa-trash"></i></a>
+                            <button class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modal-edit" 
+                            data-id="<?= $sr['id'] ?>" 
+                            data-kode_nota="<?= $sr['kode_nota'] ?>" 
+                            data-kode_barang="<?= $sr['kode_barang'] ?>" 
+                            data-jumlah="<?= $sr['jumlah'] ?>" 
+                            data-harga_jual="<?= $sr['harga_jual'] ?>" 
+                            data-total_harga_jual="<?= $sr['total_harga_jual'] ?>" 
+                            
+                            ><i class="fas fa-edit"></i>
+                            </button>
+                          </td>
+                        </tr>
+                        <?php endforeach; ?>
+                      </tbody>
+                    </table>
+                  </div>
+                  <?php 
+                  $query_barang_k = "SELECT detail_nota_jual.*, nota_jual.kode_nota ,barang_konsinyasi.nama_barang
+                    FROM detail_nota_jual 
+                    LEFT JOIN nota_jual ON detail_nota_jual.kode_nota = nota_jual.kode_nota
+                    LEFT JOIN barang_konsinyasi ON detail_nota_jual.kode_barang = barang_konsinyasi.kode_barang_konsinyasi
+                    where detail_nota_jual.kode_nota = '$kode_nota'";
+                    $result_barang_k = mysqli_query($conn, $query_barang_k);
+                    $data_detail_nota_k = mysqli_fetch_all($result_barang_k, MYSQLI_ASSOC);
+                  ?>
+                  <div class="tab-pane fade" id="custom-tabs-three-profile" role="tabpanel" aria-labelledby="custom-tabs-three-profile-tab">
+                     <button data-toggle="modal" data-target="#modal-tambah_bk" class="btn btn-primary mb-3" type="button"><i class="fas fa-plus"></i> Tambah Data</button>
+                    <a href="nota.php?id=<?= $kode_nota ?>" target="_blank" class="btn btn-info mb-3"><i class="fas fa-file-pdf"></i> Buat Nota</a>
+                    <table id="example1" class="table table-bordered table-striped">
+                      <thead>
+                      <tr>
+                        <th width="5%">No</th>
+                        <th>ID</th>
+                        <th>Kode Nota</th>
+                        <th>Barang</th>
+                        <th>Jumlah</th>
+                        <th>Harga Jual</th>
+                        <th>Total Harga Jual</th>
+                        <th>Aksi</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                        <?php
+                      $no = 1; 
+                      foreach ($data_detail_nota_k as $s) : ?>
+                        <tr>
+                          <td><?=  $no++ ; ?></td>
+                          <td><?= $s['id']; ?></td>
+                          <td><?= $s['kode_nota']; ?></td>
+                          <td><?= $s['nama_barang']; ?></td>
+                          <td><?= $s['jumlah'] ?> </td>
+                          <td><?= $s['harga_jual'] ?> </td>
+                          <td><?= $s['total_harga_jual'] ?> </td>
+                          
+                          
+                          <td>
+                            <a href="hapus.php?id=<?= $s['id']?>&kode_nota=<?= $s['kode_nota']?>" 
+                            class="btn btn-danger btn-xs" onclick="return confirm('YAKIN LU?')">
+                            <i class="fas fa-trash"></i></a>
+                            <button class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modal-edit" 
+                            data-id="<?= $s['id'] ?>" 
+                            data-kode_nota="<?= $s['kode_nota'] ?>" 
+                            data-kode_barang="<?= $s['kode_barang'] ?>" 
+                            data-jumlah="<?= $s['jumlah'] ?>" 
+                            data-harga_jual="<?= $s['harga_jual'] ?>" 
+                            data-total_harga_jual="<?= $s['total_harga_jual'] ?>" 
+                            
+                            ><i class="fas fa-edit"></i>
+                            </button>
+                          </td>
+                        </tr>
+                        <?php endforeach; ?>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <!-- /.card -->
+        </div>  
       </div>
       <!-- /.container-fluid -->
     </div>
@@ -198,14 +268,16 @@ else {
 <?php
 $query_nota_jual = "SELECT * FROM nota_jual";
 $result_nota_jual = mysqli_query($conn, $query_nota_jual);
-$query_barang = "SELECT * FROM barang";
-$result_barang = mysqli_query($conn, $query_barang);
+$query_barang_re = "SELECT * FROM barang";
+$result_barang_re = mysqli_query($conn, $query_barang_re);
+$query_barang_ko = "SELECT * FROM barang_konsinyasi";
+$result_barang_ko = mysqli_query($conn, $query_barang_ko);
 ?>
 
 
 
       <!-- modal Tambah -->
-      <div class="modal fade" id="modal-tambah">
+      <div class="modal fade" id="modal-tambah_br">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -256,10 +328,8 @@ $result_barang = mysqli_query($conn, $query_barang);
         <!-- /.modal-dialog -->
       </div>
       <!-- /.modal Tambah -->
-
-<!-- modal Edit -->
-      <!-- modal Tambah -->
-      <div class="modal fade" id="modal-edit">
+       <!-- modal Tambah -->
+      <div class="modal fade" id="modal-tambah_bk">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -269,25 +339,21 @@ $result_barang = mysqli_query($conn, $query_barang);
               </button>
             </div>
             <div class="modal-body">
-              <form action="edit.php" method="post">
+              <form action="tambah.php" method="post">
                 
                 <!-- Select Nota -->
                  <div class="form-group">
-                    <label for="id"></label>
-                    <input name="id" class="form-control" id="id" readonly required>                   
-                </div>
-                 <div class="form-group">
                     <label for="kode_nota">Nota Jual</label>
-                    <input name="kode_nota"  class="form-control" id="kode_nota" readonly required>                   
+                    <input name="kode_nota" value="<?= $kode_nota ?>" class="form-control" id="kode_nota" readonly required>                   
                 </div>
+
                 <!-- Select Barang (Perbaikan Name dan ID) -->
                 <div class="form-group">
                     <label for="kode_barang">Barang</label>
                     <select name="kode_barang" class="form-control" id="kode_barang" required>
                         <option value="">Pilih Barang</option>
-                        <?php mysqli_data_seek($result_barang, 0);
-                        while($row = mysqli_fetch_assoc($result_barang)): ?>
-                            <option value="<?= $row['kode_barang'] ?>"><?= $row['nama_barang'] ?></option>
+                        <?php while($row = mysqli_fetch_assoc($result_barang_ko)): ?>
+                            <option value="<?= $row['kode_barang_konsinyasi'] ?>"><?= $row['nama_barang'] ?></option>
                         <?php endwhile; ?>
                     </select>
                 </div>
@@ -301,15 +367,10 @@ $result_barang = mysqli_query($conn, $query_barang);
                     <label for="harga_jual">Harga Jual</label>
                     <input type="number" name="harga_jual" class="form-control" id="harga_jual" placeholder="Masukan Harga Beli" required>
                 </div>
-                
-                <div class="form-group">
-                    <label for="total_harga_beli">Total Harga Jual</label>
-                    <input type="number" name="total_harga_jual" class="form-control" id="total_harga_jual" placeholder="Masukan Total Harga Beli" required>
-                </div>
-                
+               
               <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
-                <button type="submit" name="btn_edit" class="btn btn-primary">Simpan</button>
+                <button type="submit" name="btn_tambah" class="btn btn-primary">Simpan</button>
               </div>
               </form>
             </div>
@@ -319,7 +380,7 @@ $result_barang = mysqli_query($conn, $query_barang);
         <!-- /.modal-dialog -->
       </div>
       <!-- /.modal Tambah -->
-      <!-- /.modal Edit -->
+
 
 
 
@@ -327,28 +388,6 @@ $result_barang = mysqli_query($conn, $query_barang);
 <?php include '../script.php'; ?>
 </body>
 
-<script type="text/javascript">
-   $('#modal-edit').on('show.bs.modal', function(e) {
-
-   var id = $(e.relatedTarget).data('id');
-   var kode_nota = $(e.relatedTarget).data('kode_nota');
-   var kode_barang = $(e.relatedTarget).data('kode_barang');
-   var jumlah = $(e.relatedTarget).data('jumlah');
-   var harga_jual = $(e.relatedTarget).data('harga_jual');
-   var total_harga_jual = $(e.relatedTarget).data('total_harga_jual');
-
- 
-
-  $(e.currentTarget).find('input[name="id"]').val(id);
-  $(e.currentTarget).find('input[name="kode_nota"]').val(kode_nota);
-  $(e.currentTarget).find('select[name="kode_barang"]').val(kode_barang);
-  $(e.currentTarget).find('input[name="jumlah"]').val(jumlah);
-  $(e.currentTarget).find('input[name="harga_jual"]').val(harga_jual);
-  $(e.currentTarget).find('input[name="total_harga_jual"]').val(total_harga_jual);
-   
-   });
- 
-</script> 
 
 
 </html>

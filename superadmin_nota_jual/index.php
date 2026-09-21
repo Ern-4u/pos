@@ -132,6 +132,7 @@ else {
                     <th>Total Penjualan</th>
                     <th>Status</th>
                     <th>Keterangan</th>
+                    <th>Jns Pembayaran</th>
                     <th>Aksi</th>
                   </tr>
                   </thead>
@@ -161,6 +162,7 @@ else {
                       ?> 
                       </td>
                       <td><?= $s['keterangan'] ?> </td>
+                      <td><?= $s['jenis_pembayaran'] ?></td>
                       
                       <td>
                         <a href="../superadmin_detail_nota_jual/?kode_nota=<?=$s['kode_nota'] ?>" class="btn btn-success btn-xs">

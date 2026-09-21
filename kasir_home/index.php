@@ -17,7 +17,18 @@ else {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <?php include '../css.php'; 
-  $hal = "kasir_home";
+  $hal = "beranda_superadmin";
+  require_once '../database/config.php';
+
+  
+  $query_total_penjualan = mysqli_query($conn, "SELECT SUM(total_penjualan) AS total_penjualan FROM nota_jual") or die(mysqli_error($conn));
+  $total_penjualan = mysqli_fetch_array($query_total_penjualan);
+
+  $query_total_pembelian = mysqli_query($conn, "SELECT SUM(total_pembelian) AS total_pembelian FROM nota_beli") or die(mysqli_error($conn));
+  $total_pembelian = mysqli_fetch_array($query_total_pembelian);
+
+  $laba = $total_penjualan['total_penjualan'] - $total_pembelian['total_pembelian'];
+
   ?>
 
   
@@ -72,7 +83,7 @@ else {
     <!-- Brand Logo -->
     <a href="index3.html" class="brand-link">
       <img src="../assets/AdminLTE/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light"><b>SISTEM MANAJEMEN</b>
+      <span class="brand-text font-weight-light"><b>POS</b>
       </span>
     </a>
 
@@ -84,13 +95,14 @@ else {
           <img src="../assets/AdminLTE/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">Dashboard <b>Kasir</b></a>
+          <a href="#" class="d-block">Dashboard <b>SuperAdmin</b>
+          </a>
         </div>
       </div>
 
 
       <!-- Sidebar Menu -->
-      <?php include '../sidebar_kasir.php'; ?>
+      <?php include '../sidebar_superadmin.php'; ?>
       <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->
@@ -105,15 +117,120 @@ else {
       </div><!-- /.container-fluid -->
     </div>
     <!-- /.content-header -->
+     <?php 
+     $query_terlaris = mysqli_query($conn, "SELECT 
+    p.kode_barang,
+    p.nama_barang,
+    SUM(td.jumlah) AS total_terjual,
+    SUM(td.jumlah * td.harga_jual) AS total_pendapatan
+    FROM detail_nota_jual td
+    JOIN nota_jual t ON td.kode_nota = t.kode_nota
+    JOIN barang p ON td.kode_barang = p.kode_barang
+    WHERE t.tgl_penjualan >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+    GROUP BY p.kode_barang, p.nama_barang
+    ORDER BY total_terjual DESC
+    LIMIT 10;")or die(mysqli_error($conn));
+     ?>
+     
 
     <!-- Main content -->
     <div class="content">
       <div class="container-fluid">
-        <?php
-        $username = $_SESSION['username'];
-        echo $username;
-        ?>
-        
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3>Rp.<?= $total_penjualan['total_penjualan'] ?></h3>
+
+                <p>Total Penjualan</p>
+              </div>
+              <div class="icon">
+                <i class="bi bi-cash-coin"></i>
+              </div>
+              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box --> 
+            <div class="small-box bg-warning">
+              <div class="inner">
+                <h3>Rp.<?= $total_pembelian['total_pembelian'] ?></h3>
+
+                <p>Total Pendapatan</p>
+              </div>
+              <div class="icon">
+                <i class="bi bi-cash-coin"></i>
+              </div>
+              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+             <?php 
+             if ($laba < 0) { ?>
+              <div class="small-box bg-danger">
+              <div class="inner">
+                <h3>Rp.<?= $laba ?></h3>
+
+                <p>Total Laba</p>
+              </div>
+              <div class="icon">
+                <i class="bi bi-cash-coin"></i>
+              </div>
+              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+             <?php 
+             } else { ?>
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>Rp.<?= $laba ?></h3>
+
+                <p>Total Laba</p>
+              </div>
+              <div class="icon">
+                <i class="bi bi-cash-coin"></i>
+              </div>
+              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+            <?php } ?>
+            
+          </div>
+        </div>
+        <!-- /.row -->
+         <dv class="row">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="cartd-title">Produk Terlaris</h3>
+            </div>
+            <div class="card-header">
+              <table class="table table-bordered table-striped">
+              <thead>
+              <tr>
+                <th>No</th>
+                <th>Nama Produk</th>
+                <th>Total Terjual</th>
+                <th>Total Pendapatan</th>
+              </tr>
+              </thead>
+              <tbody>
+              <?php $no = 1; while ($row = mysqli_fetch_assoc($query_terlaris)): ?>
+              <tr>
+                <td><?= $no++ ?></td>
+                <td><?= $row['nama_barang'] ?></td>
+                <td><?= $row['total_terjual'] ?></td>
+                <td><?= number_format($row['total_pendapatan'], 0, ',', '.') ?></td>
+              </tr>
+              <?php endwhile; ?>
+            </table>
+            </tbody>
+            </div>
+          </div>
+         </dv>
+
       </div>
       <!-- /.container-fluid -->
     </div>
